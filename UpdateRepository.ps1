@@ -1,6 +1,7 @@
 $BaseURL = "https://community.chocolatey.org/api/v2/package/"
 $BasePath = "C:\tools\chocolatey.server\App_Data\Packages\"
 
+# Get the redirect URL to the current version
 Function Get-RedirectedUrl 
 {
     Param (
@@ -12,16 +13,16 @@ Function Get-RedirectedUrl
     return $response.Links.href;
 }
 
+# Clean up the folder
 $files = Get-ChildItem -Filter "*.nupkg" $BasePath
-
 foreach ($file in $files)
 {
     rm $file.FullName;
     Write-Host "Remove $($file.Name)";
 }
 
+# Get all Packages
 $folders = Get-ChildItem -Directory $BasePath;
-
 foreach ($folder in $folders)
 {
     $PackageName = $folder.Name.ToLower();
@@ -34,6 +35,7 @@ foreach ($folder in $folders)
     $verfolders = Get-ChildItem -Directory "$($BasePath)$($PackageName)";
     $update = $true;
 
+    # Compare new Version with local versions
     foreach ($verfolder in $verfolders)
     {
         if ($verfolder.Name -eq $Version)
@@ -44,6 +46,7 @@ foreach ($folder in $folders)
         }
     }
 
+    # Download package if newer is available
     if ($update)
     {
         Write-Host "Download $PackageName";
